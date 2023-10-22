@@ -28,25 +28,24 @@ exports.create = (req, res) => {
     }
 
     exports.update = (req, res) => {
-        const book = new BOOK({
-            _id: req.params.id,
-            title: req.body.title,
-            author: req.body.author,
-          })
-          BOOK.updateOne({_id: req.params.id}, book).then(
-            () => {
-              res.status(201).json({
-                message: 'Book updated successfully!'
-              })
-            }
-          ).catch(
-            (error) => {
-              res.status(400).json({
-                error: error
-              })
-            }
-          )
-    }
+      const updatedBookData = {
+        title: req.body.title,
+        author: req.body.author,
+      };
+    
+      // Find the existing book by ID and update its properties
+      BOOK.findByIdAndUpdate(req.params.id, updatedBookData, { new: true })
+        .then(updatedBook => {
+          if (!updatedBook) {
+            return res.status(404).json({ message: 'Book not found' });
+          }
+          res.status(201).json(updatedBook);
+        })
+        .catch(error => {
+          res.status(400).json({ error: error });
+        });
+    };
+    
 
     exports.delete  = (req, res) => {
         BOOK.deleteOne({_id: req.params.id}).then(
